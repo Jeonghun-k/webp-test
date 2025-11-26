@@ -423,7 +423,7 @@ function getCenterEventsForDate(centerName, ymd) {
 
 const HOLIDAY_SERVICE_KEY = '5e291ed4a9dd29d49a6d3d5902ed96ad2b4fd626e874047055808e36c6e241b2';
 const HOLIDAY_BASE_URL =
-  'http://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo';
+  'https://apis.data.go.kr/B090041/openapi/service/SpcdeInfoService/getRestDeInfo';
 
 // 공휴일 API 요청 URL 미리보기
 function previewHolidayUrl() {
