@@ -1,0 +1,7 @@
+{
+  "name": "Copy of 냉장고 구조대",
+  "description": "남은 식재료를 맛있는 요리로 바꿔주는 스마트 레시피 어시스턴트. AI가 영양 분석과 요리 모드를 제공합니다.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
