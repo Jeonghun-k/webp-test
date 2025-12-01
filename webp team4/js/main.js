@@ -183,39 +183,44 @@ if ("serviceWorker" in navigator) {
 }
 
 // ================== PWA: 설치 버튼 ==================
-
-// 브라우저가 보내주는 설치 이벤트를 저장해둘 변수
 let deferredPrompt = null;
 
-// 1) 브라우저가 "이 앱 설치 가능!"이라고 알려줄 때
+// 설치 버튼 DOM을 먼저 가져오고, 항상 클릭 리스너를 단다
+const installBtn = document.getElementById("install-btn");
+if (installBtn) {
+  // 처음에는 숨겨두기
+  installBtn.style.display = "none";
+
+  installBtn.addEventListener("click", async () => {
+    // Safari, 지원 안 되는 브라우저, 또는 아직 install 가능 조건이 안 된 경우
+    if (!deferredPrompt) {
+      alert(
+        "이 브라우저에서는 아직 앱 설치 팝업을 띄울 수 없는 상태예요.\n\n" +
+        "크롬 기준:\n" +
+        " - PC: 주소창 오른쪽 '앱 설치' 아이콘 또는 ⋮ 메뉴 → '앱 설치'\n" +
+        " - 안드로이드: ⋮ 메뉴 → '홈 화면에 추가 / 앱 설치' 메뉴를 사용해 주세요."
+      );
+      return;
+    }
+
+    // 여기까지 왔다는 건 beforeinstallprompt가 한 번은 발생했다는 의미
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log("PWA install choice:", outcome);
+
+    // 한 번 쓰고 나면 초기화
+    deferredPrompt = null;
+    installBtn.style.display = "none";
+  });
+}
+
+// 브라우저가 "이제 설치 가능함"이라고 판단할 때 발생
 window.addEventListener("beforeinstallprompt", (e) => {
   console.log("beforeinstallprompt fired");
-  e.preventDefault();          // 기본 자동 설치 배너 막기
-  deferredPrompt = e;          // 나중에 버튼에서 사용
+  e.preventDefault();
+  deferredPrompt = e;
 
-  const installBtn = document.getElementById("install-btn");
-  if (!installBtn) return;
-
-  // ✅ 이제 설치 가능하니 버튼 보여주기
-  installBtn.style.display = "inline-flex";
-
-  // 혹시 기존 핸들러 있으면 초기화
-  installBtn.onclick = null;
-
-  // 2) 버튼 클릭 시 실제 설치 팝업 띄우기
-  installBtn.addEventListener(
-    "click",
-    async () => {
-      if (!deferredPrompt) return;
-
-      deferredPrompt.prompt();     // 🔥 설치 팝업
-      const { outcome } = await deferredPrompt.userChoice;
-      console.log("PWA install choice:", outcome);
-
-      // 한 번 쓰고 나면 이벤트는 폐기
-      deferredPrompt = null;
-      installBtn.style.display = "none";
-    },
-    { once: true }                 // 중복 실행 방지
-  );
+  if (installBtn) {
+    installBtn.style.display = "inline-flex";  // 이때 설치 버튼 노출
+  }
 });
