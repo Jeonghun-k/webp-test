@@ -182,29 +182,29 @@ if ("serviceWorker" in navigator) {
   });
 }
 
-// ================== PWA: 설치 버튼 (beforeinstallprompt) ==================
+// ================== PWA: 설치 버튼 ==================
+
 let deferredPrompt = null;
 
+// 브라우저가 "설치 가능해!" 라고 이벤트를 보낼 때
 window.addEventListener("beforeinstallprompt", (e) => {
-  // 기본 자동 설치 배너 막기
+  console.log("beforeinstallprompt fired");
   e.preventDefault();
   deferredPrompt = e;
-  window.__deferredPromptReady = true;
-  console.log("beforeinstallprompt fired");
 
   const installBtn = document.getElementById("install-btn");
   if (!installBtn) return;
 
-  // 기존에 걸려 있던 안내용 클릭 이벤트를 제거하고, 실제 설치용으로 교체
-  const newHandler = async () => {
+  installBtn.style.display = "inline-flex"; // 버튼 보이기
+
+  installBtn.onclick = async () => {
     if (!deferredPrompt) return;
-    deferredPrompt.prompt();
+
+    deferredPrompt.prompt();            // 🔥 설치 팝업 띄우기
     const { outcome } = await deferredPrompt.userChoice;
     console.log("PWA install choice:", outcome);
+
     deferredPrompt = null;
     installBtn.style.display = "none";
-    installBtn.removeEventListener("click", newHandler);
   };
-
-  installBtn.addEventListener("click", newHandler);
 });
