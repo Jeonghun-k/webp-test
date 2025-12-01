@@ -1,10 +1,13 @@
+// js/main.js
+
+// ================== 검색 폼 & 내 위치 검색 ==================
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("search-form");
   const citySelect = document.getElementById("city");
   const districtSelect = document.getElementById("district");
   const geoBtn = document.getElementById("geo-search-btn");
 
-  // ✅ REGION_MAP은 regions.js에서 제공
+  // REGION_MAP은 regions.js에서 제공
   if (typeof REGION_MAP !== "object") {
     console.error("REGION_MAP이 정의되지 않았습니다. regions.js 로드를 확인하세요.");
     return;
@@ -67,14 +70,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const regionString = `${city} ${district}`;
-
     const params = new URLSearchParams();
     params.set("region", regionString);
 
     window.location.href = `search.html?${params.toString()}`;
   });
 
-  // ✅ 4. 내 위치 기반 검색 버튼 동작
+  // 4. 내 위치 기반 검색 버튼 동작
   if (geoBtn) {
     geoBtn.addEventListener("click", () => {
       if (!navigator.geolocation) {
@@ -93,7 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const params = new URLSearchParams();
           params.set("lat", latitude);
           params.set("lng", longitude);
-          params.set("mode", "nearby"); // 내 주변 검색 모드 표시
+          params.set("mode", "nearby"); // 내 주변 검색 모드
 
           window.location.href = `search.html?${params.toString()}`;
         },
@@ -111,49 +113,53 @@ document.addEventListener("DOMContentLoaded", () => {
       );
     });
   }
-});
 
-// ================== QR 코드 모달 ==================
-document.addEventListener("DOMContentLoaded", () => {
+  // ================== QR 코드 모달 ==================
   const qrToggleBtn = document.getElementById("qr-toggle-btn");
   const qrOverlay = document.getElementById("qr-overlay");
   const qrCloseBtn = document.getElementById("qr-close-btn");
   const qrBox = document.getElementById("qrcode");
 
-  if (!qrToggleBtn || !qrOverlay || !qrCloseBtn || !qrBox) return;
+  if (qrToggleBtn && qrOverlay && qrCloseBtn && qrBox) {
+    let qrGenerated = false;
 
-  let qrGenerated = false;
-
-  // QR 코드에 넣을 URL (현재 메인 페이지 주소)
-  function getQrUrl() {
-    return "https://jeonghun-k.github.io/webp-test/webp%20team4/";
-  }
-
-  function renderQr() {
-    if (qrGenerated) return;         // 이미 한 번 만든 적 있으면 다시 안 만듦
-    qrBox.innerHTML = "";            // 혹시 남아있던 내용 비우기 (중복 방지)
-    new QRCode(qrBox, {
-      text: getQrUrl(),
-      width: 170,
-      height: 170,
-    });
-    qrGenerated = true;
-  }
-
-  qrToggleBtn.addEventListener("click", () => {
-    qrOverlay.style.display = "flex";
-    renderQr();
-  });
-
-  qrCloseBtn.addEventListener("click", () => {
-    qrOverlay.style.display = "none";
-  });
-
-  qrOverlay.addEventListener("click", (e) => {
-    if (e.target === qrOverlay) {
-      qrOverlay.style.display = "none";
+    // QR 코드에 넣을 URL (깃허브 페이지 메인 주소)
+    function getQrUrl() {
+      return "https://jeonghun-k.github.io/webp-test/webp%20team4/index.html";
     }
-  });
+
+    function renderQr() {
+      if (qrGenerated) return;
+      qrBox.innerHTML = "";
+      new QRCode(qrBox, {
+        text: getQrUrl(),
+        width: 170,
+        height: 170
+      });
+      qrGenerated = true;
+    }
+
+    qrToggleBtn.addEventListener("click", () => {
+      qrOverlay.style.display = "flex";
+      renderQr();
+    });
+
+    qrCloseBtn.addEventListener("click", () => {
+      qrOverlay.style.display = "none";
+    });
+
+    qrOverlay.addEventListener("click", (e) => {
+      if (e.target === qrOverlay) {
+        qrOverlay.style.display = "none";
+      }
+    });
+  }
+
+  // ================== (옵션) 디버깅용: 설치 버튼 항상 보이게 하고 싶으면 여기서 ON ==================
+  // const installBtn = document.getElementById("install-btn");
+  // if (installBtn) {
+  //   installBtn.style.display = "inline-flex";
+  // }
 });
 
 // ================== PWA: 서비스 워커 등록 ==================
@@ -174,9 +180,10 @@ if ("serviceWorker" in navigator) {
 let deferredPrompt = null;
 
 window.addEventListener("beforeinstallprompt", (e) => {
-  // 기본 자동 팝업 막기
+  // 기본 자동 설치 배너 막기
   e.preventDefault();
   deferredPrompt = e;
+  console.log("beforeinstallprompt fired");
 
   const installBtn = document.getElementById("install-btn");
   if (installBtn) {
@@ -188,7 +195,6 @@ window.addEventListener("beforeinstallprompt", (e) => {
       const choice = await deferredPrompt.userChoice;
       console.log("PWA install choice:", choice.outcome);
 
-      // 한 번 사용하면 초기화
       deferredPrompt = null;
       installBtn.style.display = "none";
     });
