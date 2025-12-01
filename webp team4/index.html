@@ -73,19 +73,20 @@
 
   <!-- ✅ 푸터: QR + 앱 설치 버튼 -->
   <footer class="main-footer">
-    <button type="button" id="qr-toggle-btn" class="qr-btn">
-      QR 코드
-    </button>
+  <button type="button" id="qr-toggle-btn" class="qr-btn">
+    QR 코드
+  </button>
 
-    <!-- 처음부터 보이게 두고 JS에서 동작만 제어 -->
-    <button
-      type="button"
-      id="install-btn"
-      class="install-btn"
-    >
-      📲 앱 설치하기
-    </button>
-  </footer>
+  <!-- ✅ 처음엔 숨겨두고, 설치 가능 상태일 때만 JS로 보여주기 -->
+  <button
+    type="button"
+    id="install-btn"
+    class="install-btn"
+    style="display: none;"
+  >
+    📲 앱 설치하기
+  </button>
+</footer>
 
   <!-- ✅ QR 코드 모달 오버레이 -->
   <div id="qr-overlay" class="qr-overlay" style="display: none;">
