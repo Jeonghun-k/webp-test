@@ -566,3 +566,52 @@ html {
   width: 180px;
   height: 180px;
 }
+
+/* ==== 로그인/회원가입 상단 우측 메인 버튼 + 로그인 영역 ==== */
+
+/* hero--small 헤더는 상단바 기준이 될 수 있게 relative */
+.hero.hero--small {
+  position: relative;
+}
+
+/* 상단 우측에 붙는 바 */
+.hero-topbar {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  z-index: 10;
+}
+
+/* 메인 화면 버튼 모양 */
+.hero-topbar .hero-home-link {
+  font-size: 0.85rem;
+  color: #f9fafb;
+  text-decoration: none;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid rgba(249, 250, 251, 0.35);
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(10px);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+/* 화살표 아이콘은 그대로 유지 */
+.hero-topbar .hero-home-link::before {
+  content: "←";
+  font-size: 0.85rem;
+}
+
+.hero-topbar .hero-home-link:hover {
+  background: rgba(248, 250, 252, 0.15);
+}
+
+/* hero-topbar 안에서는 auth-area를 절대 위치 말고 인라인으로 */
+.hero-topbar .auth-area {
+  position: static;
+  margin: 0;
+}
