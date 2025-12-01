@@ -7,13 +7,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const districtSelect = document.getElementById("district");
   const geoBtn = document.getElementById("geo-search-btn");
 
-  // REGION_MAP은 regions.js에서 제공
   if (typeof REGION_MAP !== "object") {
     console.error("REGION_MAP이 정의되지 않았습니다. regions.js 로드를 확인하세요.");
     return;
   }
 
-  // 1. 시 셀렉트 박스 채우기
   Object.keys(REGION_MAP)
     .sort()
     .forEach((cityName) => {
@@ -23,7 +21,6 @@ document.addEventListener("DOMContentLoaded", () => {
       citySelect.appendChild(option);
     });
 
-  // 2. 시 선택 시 구 채우기
   citySelect.addEventListener("change", () => {
     const selectedCity = citySelect.value;
     districtSelect.innerHTML = "";
@@ -53,7 +50,6 @@ document.addEventListener("DOMContentLoaded", () => {
     districtSelect.disabled = false;
   });
 
-  // 3. 폼 제출 시 (시/구 기반 검색)
   form.addEventListener("submit", (e) => {
     e.preventDefault();
 
@@ -72,11 +68,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const regionString = `${city} ${district}`;
     const params = new URLSearchParams();
     params.set("region", regionString);
-
     window.location.href = `search.html?${params.toString()}`;
   });
 
-  // 4. 내 위치 기반 검색 버튼 동작
   if (geoBtn) {
     geoBtn.addEventListener("click", () => {
       if (!navigator.geolocation) {
@@ -91,12 +85,10 @@ document.addEventListener("DOMContentLoaded", () => {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           const { latitude, longitude } = pos.coords;
-
           const params = new URLSearchParams();
           params.set("lat", latitude);
           params.set("lng", longitude);
-          params.set("mode", "nearby"); // 내 주변 검색 모드
-
+          params.set("mode", "nearby");
           window.location.href = `search.html?${params.toString()}`;
         },
         (err) => {
@@ -123,7 +115,6 @@ document.addEventListener("DOMContentLoaded", () => {
   if (qrToggleBtn && qrOverlay && qrCloseBtn && qrBox) {
     let qrGenerated = false;
 
-    // QR 코드에 넣을 URL (깃허브 페이지 메인 주소)
     function getQrUrl() {
       return "https://jeonghun-k.github.io/webp-test/webp%20team4/index.html";
     }
@@ -154,12 +145,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
-
-  // ================== (옵션) 디버깅용: 설치 버튼 항상 보이게 하고 싶으면 여기서 ON ==================
-  // const installBtn = document.getElementById("install-btn");
-  // if (installBtn) {
-  //   installBtn.style.display = "inline-flex";
-  // }
 });
 
 // ================== PWA: 서비스 워커 등록 ==================
@@ -180,18 +165,17 @@ if ("serviceWorker" in navigator) {
 let deferredPrompt = null;
 
 window.addEventListener("beforeinstallprompt", (e) => {
-  // 기본 자동 설치 배너 막기
   e.preventDefault();
   deferredPrompt = e;
   console.log("beforeinstallprompt fired");
 
   const installBtn = document.getElementById("install-btn");
   if (installBtn) {
-    installBtn.style.display = "inline-flex"; // 버튼 표시
+    installBtn.style.display = "inline-flex";
     installBtn.addEventListener("click", async () => {
       if (!deferredPrompt) return;
 
-      deferredPrompt.prompt(); // 설치 팝업 띄우기
+      deferredPrompt.prompt();
       const choice = await deferredPrompt.userChoice;
       console.log("PWA install choice:", choice.outcome);
 
