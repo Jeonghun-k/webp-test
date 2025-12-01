@@ -3,6 +3,31 @@
 .hero.hero--small {
   position: relative; /* 상단 바 absolute 기준 */
 }
+.hero-topbar {
+  position: absolute;
+  top: 24px;
+  right: 32px;
+  display: flex;
+  align-items: center;
+  gap: 12px; /* 메인 화면 버튼 ↔ 로그인/회원가입 간 간격 */
+}
+.hero-home-link {
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  background: transparent;
+  color: #e5e7eb;
+  font-size: 13px;
+  text-decoration: none;
+  cursor: pointer;
+
+  /* 가운데 정렬용 margin 있으면 무효화 */
+  margin: 0;
+}
+
+.hero-home-link:hover {
+  background: rgba(148, 163, 184, 0.18);
+}
 
 /* 상단 우측에 정렬되는 바 */
 .hero.hero--small .hero-topbar {
