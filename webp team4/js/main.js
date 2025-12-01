@@ -184,27 +184,38 @@ if ("serviceWorker" in navigator) {
 
 // ================== PWA: 설치 버튼 ==================
 
+// 브라우저가 보내주는 설치 이벤트를 저장해둘 변수
 let deferredPrompt = null;
 
-// 브라우저가 "설치 가능해!" 라고 이벤트를 보낼 때
+// 1) 브라우저가 "이 앱 설치 가능!"이라고 알려줄 때
 window.addEventListener("beforeinstallprompt", (e) => {
   console.log("beforeinstallprompt fired");
-  e.preventDefault();
-  deferredPrompt = e;
+  e.preventDefault();          // 기본 자동 설치 배너 막기
+  deferredPrompt = e;          // 나중에 버튼에서 사용
 
   const installBtn = document.getElementById("install-btn");
   if (!installBtn) return;
 
-  installBtn.style.display = "inline-flex"; // 버튼 보이기
+  // ✅ 이제 설치 가능하니 버튼 보여주기
+  installBtn.style.display = "inline-flex";
 
-  installBtn.onclick = async () => {
-    if (!deferredPrompt) return;
+  // 혹시 기존 핸들러 있으면 초기화
+  installBtn.onclick = null;
 
-    deferredPrompt.prompt();            // 🔥 설치 팝업 띄우기
-    const { outcome } = await deferredPrompt.userChoice;
-    console.log("PWA install choice:", outcome);
+  // 2) 버튼 클릭 시 실제 설치 팝업 띄우기
+  installBtn.addEventListener(
+    "click",
+    async () => {
+      if (!deferredPrompt) return;
 
-    deferredPrompt = null;
-    installBtn.style.display = "none";
-  };
+      deferredPrompt.prompt();     // 🔥 설치 팝업
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log("PWA install choice:", outcome);
+
+      // 한 번 쓰고 나면 이벤트는 폐기
+      deferredPrompt = null;
+      installBtn.style.display = "none";
+    },
+    { once: true }                 // 중복 실행 방지
+  );
 });
