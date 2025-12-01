@@ -13,7 +13,7 @@ const URLS_TO_CACHE = [
   "./css/main.css",
   "./css/search.css",
   "./css/focus.css",
-  "./css/mypage.css",
+  //"./css/mypage.css",
   "./js/main.js",
   "./js/search.js",
   "./js/focus.js",
