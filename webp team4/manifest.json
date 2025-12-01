@@ -1,0 +1,9 @@
+{
+  "name": "StudySpot Finder",
+  "short_name": "StudySpot",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#4f46e5"
+}
