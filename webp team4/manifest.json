@@ -1,8 +1,8 @@
 {
   "name": "StudySpot Finder",
   "short_name": "StudySpot",
-  "start_url": "./index.html",   // ✅ 또는 "./"
-  "scope": "./",                 // ✅ 현재 폴더 전체
+  "start_url": "./index.html",   
+  "scope": "./",                
   "display": "standalone",
   "background_color": "#020617",
   "theme_color": "#4f46e5",
@@ -22,12 +22,12 @@
     {
       "name": "주변 공부 장소 찾기",
       "short_name": "주변 검색",
-      "url": "./index.html#search-section"   // ✅ 상대경로
+      "url": "./index.html#search-section"   
     },
     {
       "name": "포커스 플라이트 시작",
       "short_name": "포커스",
-      "url": "./focus.html"                  // ✅ 상대경로
+      "url": "./focus.html"                  
     }
   ]
 }
