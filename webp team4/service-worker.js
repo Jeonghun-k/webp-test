@@ -1,6 +1,6 @@
 // service-worker.js
 
-const CACHE_NAME = "studyspot-cache-v2";
+const CACHE_NAME = "studyspot-cache-v3";
 
 const URLS_TO_CACHE = [
   "./",
