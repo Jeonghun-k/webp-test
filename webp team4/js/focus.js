@@ -78,7 +78,6 @@ let focusDurationMinutes = 0; // 세션 길이(분)
 let totalSeconds = 0;
 let remainingSeconds = 0;
 let timerId = null;
-// 🔽 이 줄 추가
 let targetEndTime = null; // 실제 종료 시각 (Date)
 
 const placeNameEl = document.getElementById("focus-place-name");
@@ -170,14 +169,21 @@ function tick() {
     updateFlightStatus();
     startBtn.disabled = false;
     stopBtn.disabled = true;
-  }
-}
-  remainingSeconds -= 1;
 
-  timerDisplayEl.textContent = formatTime(remainingSeconds);
-  const progress = 1 - remainingSeconds / totalSeconds;
-  progressBarEl.style.width = `${(progress * 100).toFixed(1)}%`;
-  updateFlightStatus();
+    // ✅ 여기서 세션 저장까지 하고 싶으면 이 안에 addFocusSession 호출
+    const endedAt = new Date();
+    addFocusSession({
+      name: focusPlaceName,
+      addr: focusPlaceAddr,
+      lat: focusPlaceLat,
+      lng: focusPlaceLng,
+      durationMinutes: focusDurationMinutes,
+      startedAt: focusStartTime
+        ? focusStartTime.toISOString()
+        : null,
+      endedAt: endedAt.toISOString(),
+    });
+  }
 }
 
 // 6. 비행 시작 버튼
@@ -221,7 +227,7 @@ stopBtn.addEventListener("click", () => {
     clearInterval(timerId);
     timerId = null;
   }
-  targetEndTime = null; // 🔽 이 줄 추가
+  targetEndTime = null;
 
   flightStatusEl.textContent = "중단됨";
   startBtn.disabled = false;
