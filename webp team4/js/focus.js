@@ -1,5 +1,68 @@
 // js/focus.js
 
+console.log("✅ focus.js 최신 버전 로딩됨");
+// ================== 🔔 Notification(알림) 관련 설정 ==================
+
+// 알림 권한 요청을 중복해서 하지 않기 위한 플래그
+let notificationAsked = false;
+
+// 알림 권한 요청 + 가능 여부 체크
+function ensureNotificationPermission() {
+  // 브라우저가 Notification API를 지원하지 않으면 그냥 패스
+  if (!("Notification" in window)) {
+    console.log("이 브라우저는 Notification API를 지원하지 않습니다.");
+    return;
+  }
+
+  // 현재 권한 상태 콘솔에 찍어보기 (디버깅용)
+  console.log("현재 Notification.permission =", Notification.permission);
+
+  // 아직 한 번도 요청 안 했고, 허용 상태도 아닐 때 요청
+  if (!notificationAsked && Notification.permission !== "granted") {
+    notificationAsked = true;
+    Notification.requestPermission()
+      .then((result) => {
+        console.log("알림 권한 요청 결과:", result);
+      })
+      .catch((e) => {
+        console.warn("알림 권한 요청 실패:", e);
+      });
+  }
+}
+
+// 실제로 세션 종료 시 띄울 알림
+function showEndNotification() {
+  if (!("Notification" in window)) {
+    console.log("🚫 Notification API 지원 안 함");
+    alert("타이머 종료! (이 브라우저는 시스템 알림을 지원하지 않습니다)");
+    return;
+  }
+
+  console.log("🔔 showEndNotification 호출됨, permission =", Notification.permission);
+
+  if (Notification.permission === "granted") {
+    const title = "StudySpot · 착륙 완료 ✨";
+    const body = `${focusPlaceName}에서 ${focusDurationMinutes}분 집중 세션이 끝났어요!`;
+
+    const options = {
+      body,
+      // 아이콘은 없어도 되지만 있으면 더 예쁨. 경로가 틀리면 알림은 뜨는데 콘솔에 경고만 남음.
+      icon: "./icons/icon-192.png",
+      badge: "./icons/icon-192.png",
+    };
+
+    try {
+      new Notification(title, options);
+    } catch (e) {
+      console.warn("알림 생성 실패:", e);
+      alert("타이머 종료! (알림 생성 중 에러 발생)");
+    }
+  } else {
+    console.log("알림 권한 없음, permission =", Notification.permission);
+    alert("타이머 종료! (브라우저 알림 권한이 없어 시스템 알림은 못 띄웠어요)");
+  }
+}
+
 // ================== 🔐 포커스 세션 저장 관련 설정 ==================
 
 // 로그인 사용자 정보
@@ -159,35 +222,37 @@ function tick() {
 
   // 완료 처리
   if (remainingSeconds <= 0) {
-    clearInterval(timerId);
-    timerId = null;
-    targetEndTime = null;
+  console.log("⏰ 타이머 완료 브랜치 진입");
+  clearInterval(timerId);
+  timerId = null;
+  targetEndTime = null;
 
-    // 마지막 상태 정리
-    timerDisplayEl.textContent = formatTime(0);
-    progressBarEl.style.width = "100%";
-    updateFlightStatus();
-    startBtn.disabled = false;
-    stopBtn.disabled = true;
+  timerDisplayEl.textContent = formatTime(0);
+  progressBarEl.style.width = "100%";
+  updateFlightStatus();
+  startBtn.disabled = false;
+  stopBtn.disabled = true;
 
-    // ✅ 여기서 세션 저장까지 하고 싶으면 이 안에 addFocusSession 호출
-    const endedAt = new Date();
-    addFocusSession({
-      name: focusPlaceName,
-      addr: focusPlaceAddr,
-      lat: focusPlaceLat,
-      lng: focusPlaceLng,
-      durationMinutes: focusDurationMinutes,
-      startedAt: focusStartTime
-        ? focusStartTime.toISOString()
-        : null,
-      endedAt: endedAt.toISOString(),
-    });
-  }
+  const endedAt = new Date();
+  addFocusSession({
+    name: focusPlaceName,
+    addr: focusPlaceAddr,
+    lat: focusPlaceLat,
+    lng: focusPlaceLng,
+    durationMinutes: focusDurationMinutes,
+    startedAt: focusStartTime ? focusStartTime.toISOString() : null,
+    endedAt: endedAt.toISOString(),
+  });
+
+  showEndNotification();
+}
 }
 
 // 6. 비행 시작 버튼
 startBtn.addEventListener("click", () => {
+  // 🔔 세션 시작할 때 한 번 알림 권한 요청 시도
+  ensureNotificationPermission();
+
   const minutes = parseInt(customMinutesInput.value, 10) || 25;
 
   if (!minutes || minutes <= 0) {
