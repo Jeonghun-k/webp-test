@@ -78,6 +78,8 @@ let focusDurationMinutes = 0; // 세션 길이(분)
 let totalSeconds = 0;
 let remainingSeconds = 0;
 let timerId = null;
+// 🔽 이 줄 추가
+let targetEndTime = null; // 실제 종료 시각 (Date)
 
 const placeNameEl = document.getElementById("focus-place-name");
 const placeAddrEl = document.getElementById("focus-place-addr");
@@ -137,43 +139,39 @@ function updateFlightStatus() {
   }
 }
 
-// 5. 1초마다 호출되는 tick 함수
+// 5. 1초마다 호출되는 tick 함수 (실제 시계를 기준으로 계산)
 function tick() {
+  if (!targetEndTime || !totalSeconds) return;
+
+  const now = new Date();
+  const diffMs = targetEndTime.getTime() - now.getTime();
+  // 남은 시간(초)
+  remainingSeconds = Math.max(0, Math.round(diffMs / 1000));
+
+  // 화면 표시
+  timerDisplayEl.textContent = formatTime(remainingSeconds);
+
+  // 진행률
+  const progress =
+    totalSeconds > 0 ? 1 - remainingSeconds / totalSeconds : 0;
+  progressBarEl.style.width = `${(progress * 100).toFixed(1)}%`;
+
+  updateFlightStatus();
+
+  // 완료 처리
   if (remainingSeconds <= 0) {
     clearInterval(timerId);
     timerId = null;
-    remainingSeconds = 0;
+    targetEndTime = null;
+
+    // 마지막 상태 정리
     timerDisplayEl.textContent = formatTime(0);
     progressBarEl.style.width = "100%";
     updateFlightStatus();
     startBtn.disabled = false;
     stopBtn.disabled = true;
-
-    // ✅ 여기서 세션 저장
-    const end = new Date();
-    // 시작시간이 없으면(혹시 오류 대비) 타이머 길이로 역산
-    const start =
-      focusStartTime ||
-      new Date(end.getTime() - (totalSeconds || 60) * 1000);
-
-    const duration =
-      focusDurationMinutes && !isNaN(focusDurationMinutes)
-        ? focusDurationMinutes
-        : Math.round((end.getTime() - start.getTime()) / 60000);
-
-    addFocusSession({
-      name: focusPlaceName,
-      addr: focusPlaceAddr,
-      lat: focusPlaceLat,
-      lng: focusPlaceLng,
-      durationMinutes: duration,
-      startedAt: start.toISOString(),
-      endedAt: end.toISOString(),
-    });
-
-    return;
   }
-
+}
   remainingSeconds -= 1;
 
   timerDisplayEl.textContent = formatTime(remainingSeconds);
@@ -198,6 +196,9 @@ startBtn.addEventListener("click", () => {
   totalSeconds = minutes * 60;
   remainingSeconds = totalSeconds;
 
+  // 🔽 여기서 실제 종료 시각을 기록
+  targetEndTime = new Date(focusStartTime.getTime() + totalSeconds * 1000);
+
   const now = new Date();
   const arrival = new Date(now.getTime() + totalSeconds * 1000);
   flightDepartureEl.textContent = now.toTimeString().slice(0, 5);
@@ -220,6 +221,8 @@ stopBtn.addEventListener("click", () => {
     clearInterval(timerId);
     timerId = null;
   }
+  targetEndTime = null; // 🔽 이 줄 추가
+
   flightStatusEl.textContent = "중단됨";
   startBtn.disabled = false;
   stopBtn.disabled = true;
